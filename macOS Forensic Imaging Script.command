@@ -6,17 +6,18 @@
 # Copyright 2022 City of Phoenix and Joshua Bodine
 # Written by Joshua Bodine <joshua.bodine@phoenix.gov>
 
-# On August 16, 2022, Assistant City Attorney Eric Thornhill and Digital Forensics
-# Investigative Unit supervisor Sergeant Ryan Moskop granted approval for this tool to be
-# shared on an open-source basis.  This tool is therefore released under the terms of the
-# MIT license.  Please refer to the included file "COPYING.txt" for further information.
+# On August 16, 2022, Assistant City Attorney Eric Thornhill and Digital
+# Forensics Investigative Unit supervisor Sergeant Ryan Moskop granted approval
+# for this script to be shared on an open-source basis.  This script is
+# therefore released under the terms of the MIT license.  Please refer to the
+# included file "COPYING.txt" for further information.
 
-# Please refer to the included file "README.txt" for information regarding script features
-# and usage.  Please especially note the recommendation to use another tool to inhibit
-# mounts (or set new mounts to read-only) prior to connecting any evidentiary device(s)
-# for imaging using this tool.
+# Please refer to the included file "README.txt" for information regarding
+# script features and usage.  Please especially note the recommendation to use
+# another tool to inhibit mounts (or set new mounts to read-only) prior to
+# connecting any evidentiary device(s) for imaging using this script.
 
-SCRIPT_VERSION=1
+SCRIPT_VERSION=2
 
 SOURCE_PATH=
 DESTINATION_PATH=
@@ -228,19 +229,19 @@ fi
 # use the specified block size if applicable; otherwise, if the source is a
 # block or character device, try to determine its block size
 if [ "$BLOCK_SIZE" ] ; then
-	DD_BLOCK_SIZE_ARGUMENT="bs=$BLOCK_SIZE"
+	ARG_DD_BLOCK_SIZE="bs=$BLOCK_SIZE"
 elif [ ! -z "$(echo "$SOURCE_PATH" | grep -E '^/dev/(r)?disk[0-9]+(s[0-9]+)?$')" ] ; then
-	DD_BLOCK_SIZE_ARGUMENT="bs=$(diskutil info $SOURCE_PATH | grep -i "Device Block Size" | awk '{print $4}')"
+	ARG_DD_BLOCK_SIZE="bs=$(diskutil info $SOURCE_PATH | grep -i "Device Block Size" | awk '{print $4}')"
 else
-	DD_BLOCK_SIZE_ARGUMENT=
+	ARG_DD_BLOCK_SIZE=
 fi
 
 # perform a test read of the first block of the source
-dd conv=sync,noerror $DD_BLOCK_SIZE_ARGUMENT count=1 if="$SOURCE_PATH" of=/dev/null 2>> "$LOGS_DIR/Test Read (dd).txt"
+dd conv=sync,noerror $ARG_DD_BLOCK_SIZE count=1 if="$SOURCE_PATH" of=/dev/null 2>> "$LOGS_DIR/Test Read (dd).txt"
 if [ "$?" -ne 0 ] ; then
 	echo "*** ERROR READING SOURCE ***  The source may be in use or it may have been"
 	echo "disconnected or removed.  If the source is a disk partition containing a volume"
-	echo "which is cucrrently mounted, you should unmount the volume and run this script"
+	echo "which is currently mounted, you should unmount the volume and run this script"
 	echo "again.  The following error was reported:"
 	echo
 	cat "$LOGS_DIR/Test Read (dd).txt"
@@ -284,7 +285,7 @@ fi
 echo "During the imaging process, you can monitor progress by checking the current"
 echo "image size with the following command (in a separate terminal window):"
 echo
-echo "du -sh \"$IMAGE_DIR/$IMAGE_NAME.dd\""
+echo "du -h \"$IMAGE_DIR/$IMAGE_NAME.dd\""
 echo
 
 ####################### Image Acquisition & Verification #######################
@@ -292,7 +293,7 @@ echo
 # acquire the image
 ACQUISITION_START="$(date +%s)"
 echo -n "Acquiring image... "
-dd conv=sync,noerror $DD_BLOCK_SIZE_ARGUMENT if="$SOURCE_PATH" 2>> "$LOGS_DIR/Acquisition (dd).txt" | tee >(md5 > "$LOGS_DIR/Acquisition (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Acquisition (SHA1).txt") > "$IMAGE_DIR/$IMAGE_NAME.dd"
+dd conv=sync,noerror $ARG_DD_BLOCK_SIZE if="$SOURCE_PATH" 2>> "$LOGS_DIR/Acquisition (dd).txt" | tee >(md5 > "$LOGS_DIR/Acquisition (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Acquisition (SHA1).txt") > "$IMAGE_DIR/$IMAGE_NAME.dd"
 echo "done."
 ACQUISITION_END="$(date +%s)"
 
@@ -315,9 +316,9 @@ append_log "Acquisition"
 # append them to the log
 echo -n "Calculating " ; if [ ! -z "$REHASH_SOURCE" ] ; then echo -n "source verification and " ; fi ; echo -n "image verification hashes... "
 if [ ! -z "$REHASH_SOURCE" ] ; then
-	( dd conv=sync,noerror $DD_BLOCK_SIZE_ARGUMENT if="$SOURCE_PATH" 2>> "$LOGS_DIR/Source Verification (dd).txt" | tee >(md5 > "$LOGS_DIR/Source Verification (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Source Verification (SHA1).txt") > /dev/null ) &
+	( dd conv=sync,noerror $ARG_DD_BLOCK_SIZE if="$SOURCE_PATH" 2>> "$LOGS_DIR/Source Verification (dd).txt" | tee >(md5 > "$LOGS_DIR/Source Verification (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Source Verification (SHA1).txt") > /dev/null ) &
 fi
-( dd conv=sync,noerror $DD_BLOCK_SIZE_ARGUMENT if="$IMAGE_DIR/$IMAGE_NAME.dd" 2>> "$LOGS_DIR/Image Verification (dd).txt" | tee >(md5 > "$LOGS_DIR/Image Verification (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Image Verification (SHA1).txt") > /dev/null ) &
+( dd conv=sync,noerror $ARG_DD_BLOCK_SIZE if="$IMAGE_DIR/$IMAGE_NAME.dd" 2>> "$LOGS_DIR/Image Verification (dd).txt" | tee >(md5 > "$LOGS_DIR/Image Verification (MD5).txt") >(shasum -a 1 > "$LOGS_DIR/Image Verification (SHA1).txt") > /dev/null ) &
 wait
 echo "done."
 VERIFICATION_END="$(date +%s)"
