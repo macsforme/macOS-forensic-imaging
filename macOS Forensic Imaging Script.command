@@ -175,8 +175,8 @@ if [ ! -r "$SOURCE_PATH" ] ; then
 		echo "Unable to read the source file or device.  Attempting to escalate to root"
 		echo "privileges using sudo.  You may be prompted for your password."
 
-		ARG_REHASH_SOURCE= ; if [ ! -z "$REHASH_SOURCE" ] ;  then ARG_REHASH_SOURCE=" --rehash-source" ; fi
-		ARG_BLOCK_SIZE= ; if [ ! -z "$BLOCK_SIZE" ] ;  then ARG_BLOCK_SIZE=" --block-size=$BLOCK_SIZE" ; fi
+		ARG_REHASH_SOURCE= ; if [ ! -z "$REHASH_SOURCE" ] ; then ARG_REHASH_SOURCE=" --rehash-source" ; fi
+		ARG_BLOCK_SIZE= ; if [ ! -z "$BLOCK_SIZE" ] ; then ARG_BLOCK_SIZE=" --block-size=$BLOCK_SIZE" ; fi
 		ARG_NO_CONFIRM= ; if [ ! -z "$NO_CONFIRM" ] ; then ARG_NO_CONFIRM=" --no-confirm" ; fi
 		sudo "$0" $ARG_REHASH_SOURCE $ARG_BLOCK_SIZE $ARG_NO_CONFIRM --original-uid=$(id -u) --original-gid=$(id -g) "$SOURCE_PATH" "$DESTINATION_PATH" "$IMAGE_NAME"
 		exit $?
