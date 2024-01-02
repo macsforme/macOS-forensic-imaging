@@ -3,7 +3,7 @@
 ################## Script Information & Default Configuration ##################
 
 # macOS Forensic Imaging Script
-# Copyright 2022 City of Phoenix and Joshua Bodine
+# Copyright 2022 - 2024 City of Phoenix and Joshua Bodine
 # Written by Joshua Bodine <joshua.bodine@phoenix.gov>
 
 # On August 16, 2022, Assistant City Attorney Eric Thornhill and Digital
@@ -92,7 +92,7 @@ if [ -z "$ORIGINAL_UID" ] && [ -z "$ORIGINAL_GID" ] ; then
 	INFO_HEADER="macOS Forensic Imaging Script, Version $SCRIPT_VERSION"
 	echo $INFO_HEADER
 	NUM_CHARS="$(echo -n "$INFO_HEADER" | wc -c)"
-	while [ "$NUM_CHARS" -gt 0 ] ; do printf "-" ; NUM_CHARS="$(($NUM_CHARS - 1))" ; done ; echo
+	while [ "$NUM_CHARS" -gt 0 ] ; do printf "-" ; NUM_CHARS="$((NUM_CHARS - 1))" ; done ; echo
 fi
 
 # check that the block size from the arguments (if set) is a positive integer
@@ -305,7 +305,7 @@ append_log () {
 
 	# append the designated log files to the main log
 	echo "$1" >> "$MAIN_LOG_FILE"
-	NUM_CHARS="$(echo -n $1 | wc -c)" ; while [ "$NUM_CHARS" -gt 0 ] ; do printf "-" >> "$MAIN_LOG_FILE" ; NUM_CHARS="$(($NUM_CHARS - 1))" ; done ; echo >> "$MAIN_LOG_FILE"
+	NUM_CHARS="$(echo -n $1 | wc -c)" ; while [ "$NUM_CHARS" -gt 0 ] ; do printf "-" >> "$MAIN_LOG_FILE" ; NUM_CHARS="$((NUM_CHARS - 1))" ; done ; echo >> "$MAIN_LOG_FILE"
 	cat "$LOGS_DIR/$1 (dd).txt" >> "$MAIN_LOG_FILE"
 	printf "MD5:   %s\n" $(cat "$LOGS_DIR/$1 (MD5).txt") >> "$MAIN_LOG_FILE"
 	printf "SHA1:  %s\n\n" $(cat "$LOGS_DIR/$1 (SHA1).txt" | awk '{print $1}') >> "$MAIN_LOG_FILE" # omit filename, which is just STDIN
@@ -344,13 +344,13 @@ else
 	echo "All hashes match."
 	echo "Hash Comparison:    Match" >> "$MAIN_LOG_FILE"
 fi
-ACQUISITION_DURATION=$(($ACQUISITION_END - $ACQUISITION_START))
-VERIFICATION_DURATION=$(($VERIFICATION_END - $ACQUISITION_END))
+ACQUISITION_DURATION=$((ACQUISITION_END - ACQUISITION_START))
+VERIFICATION_DURATION=$((VERIFICATION_END - ACQUISITION_END))
 echo "Acquisition Start:  $(date -r $ACQUISITION_START +"%Y-%m-%d %T %Z")" >> "$MAIN_LOG_FILE"
 echo -n "Acquisition Done:   $(date -r $ACQUISITION_END +"%Y-%m-%d %T %Z") (" >> "$MAIN_LOG_FILE"
-printf "Duration: %d:%02d:%02d)\n" $(($ACQUISITION_DURATION / 3600)) $(($ACQUISITION_DURATION % 3600 / 60)) $(($ACQUISITION_DURATION % 60)) >> "$MAIN_LOG_FILE"
+printf "Duration: %d:%02d:%02d)\n" $((ACQUISITION_DURATION / 3600)) $((ACQUISITION_DURATION % 3600 / 60)) $((ACQUISITION_DURATION % 60)) >> "$MAIN_LOG_FILE"
 echo -n "Verification Done:  $(date -r $VERIFICATION_END +"%Y-%m-%d %T %Z") (" >> "$MAIN_LOG_FILE"
-printf "Duration: %d:%02d:%02d)\n" $(($VERIFICATION_DURATION / 3600)) $(($VERIFICATION_DURATION % 3600 / 60)) $(($VERIFICATION_DURATION % 60)) >> "$MAIN_LOG_FILE"
+printf "Duration: %d:%02d:%02d)\n" $((VERIFICATION_DURATION / 3600)) $((VERIFICATION_DURATION % 3600 / 60)) $((VERIFICATION_DURATION % 60)) >> "$MAIN_LOG_FILE"
 
 # clean up
 rm -rf "$LOGS_DIR" 2> /dev/null # the individual command outputs have already been incorporated into the main log file
