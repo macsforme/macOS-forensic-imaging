@@ -1,5 +1,5 @@
 macOS Forensic Imaging Script
-Copyright 2022 City of Phoenix and Joshua Bodine
+Copyright 2022 - 2024 City of Phoenix and Joshua Bodine
 Written by Joshua Bodine <joshua.bodine@phoenix.gov>
 https://github.com/macsforme/macOS-forensic-imaging
 
